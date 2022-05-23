@@ -3,8 +3,9 @@ from tkinter import Tk, Canvas, Button, filedialog
 import pandas as pd
 import csv
 import webbrowser
+from datetime import date
 
-
+print('Vim & Co. website inventory updater\nby gus\nggaidelevicius@gmail.com\n\n')
 # main begin #
 dict_arr = []
 
@@ -19,7 +20,7 @@ def update():
     dict_arr[1].update(dict_arr[0])
     data = dict_arr[1].items()
     pd.DataFrame(data=data).to_csv(
-        "UPDATED_INVENTORY.csv", index=False, header=None)
+        f"UPDATED_INVENTORY-{date.today()}.csv", index=False, header=None)
     print('created updated file')
     create_csv.config(text='✅ CSV created')
     create_csv.config(bg='#d5fcbd')
@@ -144,7 +145,6 @@ create_csv.place(
 
 def send_help():
     error_string = ''.join(ch for ch in str(ERROR) if ch.isalnum() or ch == ' ').replace(' ', '%20')
-    print(error_string)
     webbrowser.open(f'https://ggaidelevicius.com/redirect?subject=the%20inventory%20updater%20is%20broken%20again&body={error_string}', new=2)
 
 help_button = Button(
