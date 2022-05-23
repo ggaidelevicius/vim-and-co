@@ -1,8 +1,11 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, filedialog, StringVar, OptionMenu
+from tkinter import Tk, Canvas, Button, filedialog
 import pandas as pd
 import csv
+import webbrowser
 
+
+# main begin #
 dict_arr = []
 
 
@@ -13,34 +16,32 @@ def load_csv(fp: str, col_one: int, col_two: int):
 
 
 def update():
-    try:
-        dict_arr[1].update(dict_arr[0])
-        data = dict_arr[1].items()
-        pd.DataFrame(data=data).to_csv(
-            "UPDATED_INVENTORY.csv", index=False, header=None)
-        print('created updated file')
-        create_csv.config(text='✅ CSV created')
-        create_csv.config(bg='#d5fcbd')
-    except Exception as e:
-        print(e)
+    dict_arr[1].update(dict_arr[0])
+    data = dict_arr[1].items()
+    pd.DataFrame(data=data).to_csv(
+        "UPDATED_INVENTORY.csv", index=False, header=None)
+    print('created updated file')
+    create_csv.config(text='✅ CSV created')
+    create_csv.config(bg='#d5fcbd')
 
-
+ERROR = ''
 def processButton(old, new):
+    global ERROR
     try:
         load_csv(new, 26, 30)
         load_csv(old, 2, 14)
     except Exception as e:
+        ERROR = e
         print(e)
         create_csv.config(text=f"Error: {e}")
         create_csv.config(bg='#f55858')
-        help_button.place_configure(x=40.0,
-                                    y=286.0,
-                                    width=420.0,
-                                    height=30.0)
+        help_button.place_configure(x=40.0, y=286.0, width=420.0, height=30.0)
 
     update()
 
+# main end #
 
+# gui begin #
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 
@@ -141,15 +142,23 @@ create_csv.place(
     height=57.0
 )
 
+def send_help():
+    error_string = ''.join(ch for ch in str(ERROR) if ch.isalnum() or ch == ' ').replace(' ', '%20')
+    print(error_string)
+    webbrowser.open(f'https://ggaidelevicius.com/redirect?subject=the%20inventory%20updater%20is%20broken%20again&body={error_string}', new=2)
+
 help_button = Button(
     borderwidth=0,
     highlightthickness=0,
     relief="flat",
     text='Click me to contact Gus for help',
     font='arial 8 bold',
-    bg='#8cddfe'
+    bg='#8cddfe',
+    command=send_help
 )
 
 
 window.resizable(False, False)
 window.mainloop()
+
+# gui end #
