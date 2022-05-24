@@ -6,12 +6,13 @@ import webbrowser
 from datetime import date
 import requests
 
-print('Vim & Co. website inventory updater\nby gus\nggaidelevicius@gmail.com\n')
+print('Vim & Co. website inventory updater\nby gus 2022\nggaidelevicius@gmail.com')
 response = requests.get(
     'https://api.github.com/repos/ggaidelevicius/vim-and-co/releases/latest').json()
 print(f'{response["tag_name"]}\n')
 
-isCurrentVersion = response["tag_name"] == 'v1.0.2'  # ⚡ IMPORTANT ⚡ version bump to match release number on github
+# ⚡ IMPORTANT ⚡ version bump to match release number on github
+isCurrentVersion = response["tag_name"] == 'v1.0.3'
 downloadLink = response["assets"][0]["browser_download_url"]
 
 # main begin #
@@ -25,7 +26,8 @@ def load_csv(fp: str, col_one: int, col_two: int):
 
 
 def update():
-    dict_arr[1].update(dict_arr[0])
+    dict_arr[1].update((k, dict_arr[0][k]) for k in dict_arr[1].keys() & dict_arr[0].keys())
+
     data = dict_arr[1].items()
     pd.DataFrame(data=data).to_csv(
         f"UPDATED_INVENTORY-{date.today()}.csv", index=False, header=None)
@@ -33,7 +35,10 @@ def update():
     create_csv.config(text='✅ CSV created')
     create_csv.config(bg='#d5fcbd')
 
+
 ERROR = ''
+
+
 def processButton(old, new):
     global ERROR
     try:
@@ -49,6 +54,7 @@ def processButton(old, new):
     update()
 
 # main end #
+
 
 # gui begin #
 OUTPUT_PATH = Path(__file__).parent
@@ -77,11 +83,9 @@ canvas = Canvas(
 )
 canvas.place(x=0, y=0)
 
-print(isCurrentVersion)
 if isCurrentVersion:
     WEB_EXPORT = ''
     STOCK_EXPORT = ''
-
 
     def select_file(type):
         global WEB_EXPORT, STOCK_EXPORT
@@ -98,13 +102,11 @@ if isCurrentVersion:
         print(f"{type}: {filename}")
         return filename
 
-
     def button_pressed(button):
         if button == "web_export":
             web_export_button.config(text=select_file(button))
         else:
             inventory_management_export.config(text=select_file(button))
-
 
     web_export_button = Button(
         text='Click me to select the website export CSV',
@@ -153,8 +155,10 @@ if isCurrentVersion:
     )
 
     def send_help():
-        error_string = ''.join(ch for ch in str(ERROR) if ch.isalnum() or ch == ' ').replace(' ', '%20')
-        webbrowser.open(f'https://ggaidelevicius.com/redirect?subject=the%20inventory%20updater%20is%20broken%20again&body={error_string}', new=2)
+        error_string = ''.join(ch for ch in str(
+            ERROR) if ch.isalnum() or ch == ' ').replace(' ', '%20')
+        webbrowser.open(
+            f'https://ggaidelevicius.com/redirect?subject=the%20inventory%20updater%20is%20broken%20again&body={error_string}', new=2)
 
     help_button = Button(
         borderwidth=0,
