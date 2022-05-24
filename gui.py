@@ -11,7 +11,7 @@ response = requests.get(
     'https://api.github.com/repos/ggaidelevicius/vim-and-co/releases/latest').json()
 print(f'{response["tag_name"]}\n')
 
-isCurrentVersion = response["tag_name"] == 'v1.0.0'
+isCurrentVersion = response["tag_name"] == 'v1.0.2'  # ⚡ IMPORTANT ⚡ version bump to match release number on github
 downloadLink = response["assets"][0]["browser_download_url"]
 
 # main begin #
