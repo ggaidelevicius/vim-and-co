@@ -7,13 +7,18 @@ from datetime import date
 import requests
 
 print('Vim & Co. website inventory updater\nby gus 2022\nggaidelevicius@gmail.com')
-response = requests.get(
-    'https://api.github.com/repos/ggaidelevicius/vim-and-co/releases/latest').json()
-print(f'{response["tag_name"]}\n')
+try:
+    response = requests.get(
+        'https://api.github.com/repos/ggaidelevicius/vim-and-co/releases/latest', timeout=30).json()
+    print(f'{response["tag_name"]}\n')
 
-# ⚡ IMPORTANT ⚡ version bump to match release number on github
-isCurrentVersion = response["tag_name"] == 'v1.0.3'
-downloadLink = response["assets"][0]["browser_download_url"]
+    # ⚡ IMPORTANT ⚡ version bump to match release number on github
+    isCurrentVersion = response["tag_name"] == 'v1.0.3'
+    downloadLink = response["assets"][0]["browser_download_url"]
+except requests.ConnectionError as e:
+    print(e)
+    isCurrentVersion = True
+
 
 # main begin #
 dict_arr = []
