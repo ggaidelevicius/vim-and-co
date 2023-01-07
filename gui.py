@@ -12,7 +12,7 @@ response = requests.get(
 print(f'{response["tag_name"]}\n')
 
 # ⚡ IMPORTANT ⚡ version bump to match release number on github
-isCurrentVersion = response["tag_name"] == 'v1.0.3'
+isCurrentVersion = response["tag_name"] == 'v1.0.4'
 downloadLink = response["assets"][0]["browser_download_url"]
 
 # main begin #
@@ -171,8 +171,94 @@ if isCurrentVersion:
     )
 
 else:
-    update_available = Button(
+    WEB_EXPORT = ''
+    STOCK_EXPORT = ''
+
+    def select_file(type):
+        global WEB_EXPORT, STOCK_EXPORT
+        filetypes = [('CSV', '*.csv')]
+        filename = filedialog.askopenfilename(
+            title='select afile',
+            initialdir='./',
+            filetypes=filetypes
+        )
+        if type == "web_export":
+            WEB_EXPORT = filename
+        else:
+            STOCK_EXPORT = filename
+        print(f"{type}: {filename}")
+        return filename
+
+    def button_pressed(button):
+        if button == "web_export":
+            web_export_button.config(text=select_file(button))
+        else:
+            inventory_management_export.config(text=select_file(button))
+
+    web_export_button = Button(
+        text='Click me to select the website export CSV',
+        command=lambda: button_pressed("web_export"),
+        borderwidth=0,
+        highlightthickness=0,
+        relief="flat"
+    )
+
+    web_export_button.place(
+        x=40.0,
+        y=65,
+        width=420.0,
+        height=57.0
+    )
+
+    inventory_management_export = Button(
+        text='Click me to select the inventory management export CSV',
+        command=lambda: button_pressed("inventory_management_export"),
+        borderwidth=0,
+        highlightthickness=0,
+        relief="flat"
+    )
+
+    inventory_management_export.place(
+        x=40.0,
+        y=132.0,
+        width=420.0,
+        height=57.0
+    )
+
+    create_csv = Button(
         bg='#d5fcbd',
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: processButton(WEB_EXPORT, STOCK_EXPORT),
+        relief="flat",
+        text='Create the updated stock file CSV',
+        font='arial 11 bold'
+    )
+    create_csv.place(
+        x=40.0,
+        y=219.0,
+        width=420.0,
+        height=57.0
+    )
+
+    def send_help():
+        error_string = ''.join(ch for ch in str(
+            ERROR) if ch.isalnum() or ch == ' ').replace(' ', '%20')
+        webbrowser.open(
+            f'https://ggaidelevicius.com/redirect?subject=the%20inventory%20updater%20is%20broken%20again&body={error_string}', new=2)
+
+    help_button = Button(
+        borderwidth=0,
+        highlightthickness=0,
+        relief="flat",
+        text='Click me to contact Gus for help',
+        font='arial 8 bold',
+        bg='#8cddfe',
+        command=send_help
+    )
+
+    update_available = Button(
+        bg='#4beaff',
         borderwidth=0,
         highlightthickness=0,
         command=lambda: webbrowser.open(downloadLink),
@@ -183,9 +269,9 @@ else:
 
     update_available.place(
         x=40.0,
-        y=142.0,
+        y=10.0,
         width=420.0,
-        height=57.0
+        height=47.0
     )
 
 
