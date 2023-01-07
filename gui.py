@@ -6,14 +6,16 @@ import webbrowser
 from datetime import date
 import requests
 
-print('Vim & Co. website inventory updater\nby gus 2022\nggaidelevicius@gmail.com')
+print("Vim & Co. website inventory updater\nby gus 2022\nggaidelevicius@gmail.com")
 try:
     response = requests.get(
-        'https://api.github.com/repos/ggaidelevicius/vim-and-co/releases/latest', timeout=30).json()
+        "https://api.github.com/repos/ggaidelevicius/vim-and-co/releases/latest",
+        timeout=30,
+    ).json()
     print(f'{response["tag_name"]}\n')
 
     # ⚡ IMPORTANT ⚡ version bump to match release number on github
-    isCurrentVersion = response["tag_name"] == 'v1.0.4'
+    isCurrentVersion = response["tag_name"] == "v1.0.4"
     downloadLink = response["assets"][0]["browser_download_url"]
 except requests.ConnectionError as e:
     print(e)
@@ -24,23 +26,26 @@ dict_arr = []
 
 
 def load_csv(fp: str, col_one: int, col_two: int):
-    with open(fp, mode='r', encoding="utf8") as inp:
+    with open(fp, mode="r", encoding="utf8") as inp:
         reader = csv.reader(inp)
         dict_arr.append({rows[col_one]: rows[col_two] for rows in reader})
 
 
 def update():
-    dict_arr[1].update((k, dict_arr[0][k]) for k in dict_arr[1].keys() & dict_arr[0].keys())
+    dict_arr[1].update(
+        (k, dict_arr[0][k]) for k in dict_arr[1].keys() & dict_arr[0].keys()
+    )
 
     data = dict_arr[1].items()
     pd.DataFrame(data=data).to_csv(
-        f"UPDATED_INVENTORY-{date.today()}.csv", index=False, header=None)
-    print('created updated file')
-    create_csv.config(text='✅ CSV created')
-    create_csv.config(bg='#d5fcbd')
+        f"UPDATED_INVENTORY-{date.today()}.csv", index=False, header=None
+    )
+    print("created updated file")
+    create_csv.config(text="✅ CSV created")
+    create_csv.config(bg="#d5fcbd")
 
 
-ERROR = ''
+ERROR = ""
 
 
 def processButton(old, new):
@@ -52,10 +57,11 @@ def processButton(old, new):
         ERROR = e
         print(e)
         create_csv.config(text=f"Error: {e}")
-        create_csv.config(bg='#f55858')
+        create_csv.config(bg="#f55858")
         help_button.place_configure(x=40.0, y=286.0, width=420.0, height=30.0)
 
     update()
+
 
 # main end #
 
@@ -83,21 +89,19 @@ canvas = Canvas(
     width=500,
     bd=0,
     highlightthickness=0,
-    relief="ridge"
+    relief="ridge",
 )
 canvas.place(x=0, y=0)
 
 if isCurrentVersion:
-    WEB_EXPORT = ''
-    STOCK_EXPORT = ''
+    WEB_EXPORT = ""
+    STOCK_EXPORT = ""
 
     def select_file(type):
         global WEB_EXPORT, STOCK_EXPORT
-        filetypes = [('CSV', '*.csv')]
+        filetypes = [("CSV", "*.csv")]
         filename = filedialog.askopenfilename(
-            title='select afile',
-            initialdir='./',
-            filetypes=filetypes
+            title="select afile", initialdir="./", filetypes=filetypes
         )
         if type == "web_export":
             WEB_EXPORT = filename
@@ -113,78 +117,64 @@ if isCurrentVersion:
             inventory_management_export.config(text=select_file(button))
 
     web_export_button = Button(
-        text='Click me to select the website export CSV',
+        text="Click me to select the website export CSV",
         command=lambda: button_pressed("web_export"),
         borderwidth=0,
         highlightthickness=0,
-        relief="flat"
+        relief="flat",
     )
 
-    web_export_button.place(
-        x=40.0,
-        y=65,
-        width=420.0,
-        height=57.0
-    )
+    web_export_button.place(x=40.0, y=65, width=420.0, height=57.0)
 
     inventory_management_export = Button(
-        text='Click me to select the inventory management export CSV',
+        text="Click me to select the inventory management export CSV",
         command=lambda: button_pressed("inventory_management_export"),
         borderwidth=0,
         highlightthickness=0,
-        relief="flat"
+        relief="flat",
     )
 
-    inventory_management_export.place(
-        x=40.0,
-        y=132.0,
-        width=420.0,
-        height=57.0
-    )
+    inventory_management_export.place(x=40.0, y=132.0, width=420.0, height=57.0)
 
     create_csv = Button(
-        bg='#d5fcbd',
+        bg="#d5fcbd",
         borderwidth=0,
         highlightthickness=0,
         command=lambda: processButton(WEB_EXPORT, STOCK_EXPORT),
         relief="flat",
-        text='Create the updated stock file CSV',
-        font='arial 11 bold'
+        text="Create the updated stock file CSV",
+        font="arial 11 bold",
     )
-    create_csv.place(
-        x=40.0,
-        y=219.0,
-        width=420.0,
-        height=57.0
-    )
+    create_csv.place(x=40.0, y=219.0, width=420.0, height=57.0)
 
     def send_help():
-        error_string = ''.join(ch for ch in str(
-            ERROR) if ch.isalnum() or ch == ' ').replace(' ', '%20')
+        error_string = "".join(
+            ch for ch in str(ERROR) if ch.isalnum() or ch == " "
+        ).replace(" ", "%20")
         webbrowser.open(
-            f'https://ggaidelevicius.com/redirect?subject=the%20inventory%20updater%20is%20broken%20again&body={error_string}', new=2)
+            f"https://ggaidelevicius.com/redirect?subject=the%20inventory%20updater%20is%20broken%20again&body={error_string}",
+            new=2,
+        )
 
     help_button = Button(
         borderwidth=0,
         highlightthickness=0,
         relief="flat",
-        text='Click me to contact Gus for help',
-        font='arial 8 bold',
-        bg='#8cddfe',
-        command=send_help
+        text="Click me to contact Gus for help",
+        font="arial 8 bold",
+        bg="#8cddfe",
+        command=send_help,
     )
 
 else:
-    WEB_EXPORT = ''
-    STOCK_EXPORT = ''
+    WEB_EXPORT = ""
+    STOCK_EXPORT = ""
 
     def select_file(type):
         global WEB_EXPORT, STOCK_EXPORT
-        filetypes = [('CSV', '*.csv')]
+        filetypes = [("CSV", "*.csv")]
         filename = filedialog.askopenfilename(
-            title='select afile',
-            initialdir='./',
-            filetypes=filetypes
+            title="select afile", initialdir="./", filetypes=filetypes
         )
         if type == "web_export":
             WEB_EXPORT = filename
@@ -200,83 +190,66 @@ else:
             inventory_management_export.config(text=select_file(button))
 
     web_export_button = Button(
-        text='Click me to select the website export CSV',
+        text="Click me to select the website export CSV",
         command=lambda: button_pressed("web_export"),
         borderwidth=0,
         highlightthickness=0,
-        relief="flat"
+        relief="flat",
     )
 
-    web_export_button.place(
-        x=40.0,
-        y=65,
-        width=420.0,
-        height=57.0
-    )
+    web_export_button.place(x=40.0, y=65, width=420.0, height=57.0)
 
     inventory_management_export = Button(
-        text='Click me to select the inventory management export CSV',
+        text="Click me to select the inventory management export CSV",
         command=lambda: button_pressed("inventory_management_export"),
         borderwidth=0,
         highlightthickness=0,
-        relief="flat"
+        relief="flat",
     )
 
-    inventory_management_export.place(
-        x=40.0,
-        y=132.0,
-        width=420.0,
-        height=57.0
-    )
+    inventory_management_export.place(x=40.0, y=132.0, width=420.0, height=57.0)
 
     create_csv = Button(
-        bg='#d5fcbd',
+        bg="#d5fcbd",
         borderwidth=0,
         highlightthickness=0,
         command=lambda: processButton(WEB_EXPORT, STOCK_EXPORT),
         relief="flat",
-        text='Create the updated stock file CSV',
-        font='arial 11 bold'
+        text="Create the updated stock file CSV",
+        font="arial 11 bold",
     )
-    create_csv.place(
-        x=40.0,
-        y=219.0,
-        width=420.0,
-        height=57.0
-    )
+    create_csv.place(x=40.0, y=219.0, width=420.0, height=57.0)
 
     def send_help():
-        error_string = ''.join(ch for ch in str(
-            ERROR) if ch.isalnum() or ch == ' ').replace(' ', '%20')
+        error_string = "".join(
+            ch for ch in str(ERROR) if ch.isalnum() or ch == " "
+        ).replace(" ", "%20")
         webbrowser.open(
-            f'https://ggaidelevicius.com/redirect?subject=the%20inventory%20updater%20is%20broken%20again&body={error_string}', new=2)
+            f"https://ggaidelevicius.com/redirect?subject=the%20inventory%20updater%20is%20broken%20again&body={error_string}",
+            new=2,
+        )
 
     help_button = Button(
         borderwidth=0,
         highlightthickness=0,
         relief="flat",
-        text='Click me to contact Gus for help',
-        font='arial 8 bold',
-        bg='#8cddfe',
-        command=send_help
+        text="Click me to contact Gus for help",
+        font="arial 8 bold",
+        bg="#8cddfe",
+        command=send_help,
     )
 
     update_available = Button(
-        bg='#4beaff',
+        bg="#4beaff",
         borderwidth=0,
         highlightthickness=0,
         command=lambda: webbrowser.open(downloadLink),
         relief="flat",
-        text='⚡Update available. Click here to download⚡',
-        font='arial 11 bold'
+        text="⚡Update available. Click here to download⚡",
+        font="arial 11 bold",
     )
 
-    update_available.place(
-        x=40.0,
-        y=10.0,
-        width=420.0,
-        height=47.0
-    )
+    update_available.place(x=40.0, y=10.0, width=420.0, height=47.0)
 
 
 window.resizable(False, False)
